@@ -85,6 +85,7 @@
         self.contentScaleFactor = [[UIScreen mainScreen] scale];
     }
 
+    outputRotation = kGPUImageNoRotation;
     inputRotation = kGPUImageNoRotation;
     self.opaque = YES;
     self.hidden = NO;
@@ -383,7 +384,12 @@
         glUniform1i(displayInputTextureUniform, 4);
         
         glVertexAttribPointer(displayPositionAttribute, 2, GL_FLOAT, 0, 0, imageVertices);
-        glVertexAttribPointer(displayTextureCoordinateAttribute, 2, GL_FLOAT, 0, 0, [GPUImageView textureCoordinatesForRotation:inputRotation]);
+        if( outputRotation == kGPUImageNoRotation ) {
+            glVertexAttribPointer(displayTextureCoordinateAttribute, 2, GL_FLOAT, 0, 0, [GPUImageView textureCoordinatesForRotation:inputRotation]);
+        }
+        else {
+            glVertexAttribPointer(displayTextureCoordinateAttribute, 2, GL_FLOAT, 0, 0, [GPUImageView textureCoordinatesForRotation:outputRotation]);
+        }
         
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         
@@ -407,6 +413,10 @@
 - (void)setInputRotation:(GPUImageRotationMode)newInputRotation atIndex:(NSInteger)textureIndex;
 {
     inputRotation = newInputRotation;
+}
+
+- (void)forceOutputRotation:(GPUImageRotationMode)rotation {
+    outputRotation = rotation;
 }
 
 - (void)setInputSize:(CGSize)newSize atIndex:(NSInteger)textureIndex;
